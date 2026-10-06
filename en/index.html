@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TÖR · furniture and lighting in Almaty</title>
+  <meta name="description" content="TÖR is a furniture and lighting store in Almaty. Sofas, armchairs, tables, beds and storage with prices and live stock, delivery and assembly. Website concept.">
+  <meta name="theme-color" content="#F0EEE9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121110" media="(prefers-color-scheme: dark)">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="alternate" hreflang="ru" href="../">
+  <link rel="alternate" hreflang="en" href="./">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preload" as="image" href="../img/room-a.webp" fetchpriority="high">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+  <link rel="stylesheet" href="../css/style.css">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <a class="skip" href="#catalog">Skip to the catalogue</a>
+
+  <header class="top" id="top">
+    <div class="wrap top-in">
+      <a href="#" class="logo" aria-label="TÖR, back to top">T<span>Ö</span>R</a>
+      <nav class="nav" aria-label="Sections">
+        <a href="#catalog">Catalogue</a>
+        <a href="#room">The room</a>
+        <a href="#service">Service</a>
+        <a href="#showroom">Showroom</a>
+      </nav>
+      <div class="top-actions">
+        <nav class="lang" aria-label="Language">
+          <a href="../" hreflang="ru" lang="ru">RU</a>
+          <a href="./" aria-current="page">EN</a>
+        </nav>
+        <button class="icon-btn" type="button" data-act="search" aria-label="Search"><i class="ph ph-magnifying-glass" aria-hidden="true"></i></button>
+        <button class="cart-btn" type="button" data-act="cart" aria-label="Bag">
+          <i class="ph ph-bag-simple" aria-hidden="true"></i><span class="cart-label">Bag</span><b class="cart-count" id="cartCount" hidden>0</b>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="wrap hero-head">
+        <h1 id="heroTitle" class="hero-title">Furniture for the <em>tör</em><sup>*</sup> — the place where your people gather</h1>
+        <div class="hero-side">
+          <p class="hero-lead">Sofas, chairs, tables and lights that fall into place as a room. Tap anything in the photo.</p>
+          <p class="footnote"><sup>*</sup> The tör is the seat of honour in a Kazakh home, facing the door. It is where the dearest guests sit.</p>
+        </div>
+      </div>
+
+      <div class="room" id="room">
+        <div class="room-scroll" tabindex="0" aria-label="Living room interior, swipe sideways">
+          <div class="room-stage" id="roomStage">
+            <img src="../img/room-a.webp" alt="A bright living room with a curved sofa, two armchairs, a coffee table and a floor lamp" width="2200" height="1026" fetchpriority="high">
+          </div>
+        </div>
+        <div class="room-pop" id="roomPop" hidden></div>
+        <p class="room-hint" aria-hidden="true"><i class="ph ph-hand-swipe-right"></i>Swipe the room</p>
+      </div>
+
+      <div class="wrap room-bar" id="roomBar"></div>
+    </section>
+
+    <section class="wrap index" aria-labelledby="indexTitle">
+      <div class="sec-head">
+        <h2 id="indexTitle" class="sec-title">Looking for?</h2>
+        <p class="sec-note">8 sections · from a vase to a corner sofa</p>
+      </div>
+      <ol class="index-list" id="indexList"></ol>
+      <div class="index-peek" id="indexPeek" aria-hidden="true"><img alt=""></div>
+    </section>
+
+    <section class="catalog" id="catalog" aria-labelledby="catTitle">
+      <div class="wrap sec-head">
+        <h2 id="catTitle" class="sec-title">Catalogue</h2>
+        <p class="sec-note" id="catCount"></p>
+      </div>
+
+      <div class="toolbar" id="toolbar">
+        <div class="wrap toolbar-in">
+          <div class="chips" id="chips" role="tablist" aria-label="Categories"></div>
+          <div class="tools">
+            <label class="search">
+              <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+              <input type="search" id="q" placeholder="Sofa, oak, brass…" autocomplete="off" aria-label="Search the catalogue">
+            </label>
+            <button class="tool-btn" type="button" id="filterBtn" aria-expanded="false" aria-controls="filters"><i class="ph ph-sliders-horizontal" aria-hidden="true"></i><span>Filters</span><b id="filterDot" hidden></b></button>
+            <label class="sort">
+              <span class="sr">Sort</span>
+              <select id="sort">
+                <option value="pop">Most popular</option>
+                <option value="new">Newest first</option>
+                <option value="cheap">Price: low to high</option>
+                <option value="dear">Price: high to low</option>
+              </select>
+              <i class="ph ph-caret-down caret" aria-hidden="true"></i>
+              <i class="ph ph-arrows-down-up sort-ic" aria-hidden="true"></i>
+            </label>
+          </div>
+        </div>
+        <div class="filters" id="filters" hidden>
+          <div class="wrap filters-in">
+            <fieldset class="f-price">
+              <legend>Price, ₸</legend>
+              <input type="number" id="fMin" inputmode="numeric" placeholder="from" min="0" step="1000" aria-label="Price from">
+              <span aria-hidden="true">—</span>
+              <input type="number" id="fMax" inputmode="numeric" placeholder="to" min="0" step="1000" aria-label="Price to">
+            </fieldset>
+            <fieldset class="f-width">
+              <legend>Fits a width of <output id="fWidthOut">any</output></legend>
+              <input type="range" id="fWidth" min="40" max="320" step="10" value="320" aria-label="Maximum width, cm">
+            </fieldset>
+            <div class="f-toggles">
+              <label class="check"><input type="checkbox" id="fStock"><span>In stock only</span></label>
+              <label class="check"><input type="checkbox" id="fSale"><span>On sale</span></label>
+            </div>
+            <button class="link-btn" type="button" id="fReset">Reset all</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap">
+        <ul class="grid" id="grid" aria-live="polite"></ul>
+        <div class="empty" id="empty" hidden>
+          <p class="empty-title">Nothing found</p>
+          <p>Try another word or clear the filters.</p>
+          <button class="btn btn-ghost" type="button" data-act="reset-filters">Show everything</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="service" id="service" aria-labelledby="servTitle">
+      <div class="wrap service-in">
+        <figure class="service-img">
+          <img src="../img/room-e-s.webp" srcset="../img/room-e-s.webp 900w, ../img/room-e.webp 2200w" sizes="(min-width: 900px) 45vw, 100vw" alt="A leather lounge chair by the fireplace" width="900" height="600" loading="lazy">
+        </figure>
+        <div class="service-copy">
+          <h2 id="servTitle" class="sec-title">Delivered, assembled, <em>set in place</em></h2>
+          <ol class="steps">
+            <li><b>A 3D plan of your room</b><span>Send us a floor plan and a couple of photos — a designer will furnish it from our range in two days. Free.</span></li>
+            <li><b>Delivery across Almaty</b><span>1–3 days for anything in stock. Free over 300,000 ₸, otherwise 9,000 ₸.</span></li>
+            <li><b>Assembly and packaging removal</b><span>Our team assembles, levels everything and takes the cardboard away.</span></li>
+            <li><b>5-year frame warranty</b><span>If something creaks, we come back and fix it.</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="showroom" id="showroom" aria-labelledby="showTitle">
+      <img class="showroom-bg" src="../img/room-c-s.webp" srcset="../img/room-c-s.webp 900w, ../img/room-c.webp 2200w" sizes="100vw" alt="" loading="lazy" width="2200" height="1245">
+      <div class="wrap showroom-in">
+        <h2 id="showTitle" class="showroom-title">Sit on everything <em>before you buy</em></h2>
+        <p class="showroom-text">A 600 m² showroom at 150 Abay Avenue. Open daily 10:00–21:00, parking in the courtyard.</p>
+        <div class="showroom-cta">
+          <a class="btn btn-light" href="tel:+77000000000"><i class="ph ph-phone" aria-hidden="true"></i>+7 700 000 00 00</a>
+          <a class="btn btn-line" href="https://wa.me/77000000000" target="_blank" rel="noopener"><i class="ph ph-whatsapp-logo" aria-hidden="true"></i>WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p class="foot-logo" aria-hidden="true">T<span>Ö</span>R</p>
+      <div class="foot-cols">
+        <p>150 Abay Avenue, Almaty<br>Daily 10:00–21:00</p>
+        <p><a href="tel:+77000000000">+7 700 000 00 00</a><br><a href="mailto:hello@tor.example">hello@tor.example</a></p>
+        <p><a href="admin/" class="foot-admin"><i class="ph ph-squares-four" aria-hidden="true"></i>Admin panel</a></p>
+      </div>
+      <p class="foot-note">Website concept: the store, phone numbers and address are fictional. Photos from Unsplash: <span id="credits"></span>.</p>
+    </div>
+  </footer>
+
+  <dialog class="pd" id="pd" aria-labelledby="pdTitle"></dialog>
+  <dialog class="drawer" id="cart" aria-labelledby="cartTitle"></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="../js/shop.js"></script>
+</body>
+</html>

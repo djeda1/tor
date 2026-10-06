@@ -23,14 +23,6 @@
   --ease: cubic-bezier(.2, .7, .2, 1);
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #121110; --surface: #1B1A18; --tint: #24221F; --ink: #EDEAE3; --ink-2: #C4BFB6; --muted: #9D978D;
-    --line: #2F2D29; --accent: #8D97FF; --accent-ink: #0E1030; --accent-soft: #23264A;
-    --ok: #6CC08A; --warn: #E0A458; --bad: #F07A70; --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 16px 40px -12px rgb(0 0 0 / .6);
-    color-scheme: dark;
-  }
-}
 :root[data-theme="dark"] {
   --bg: #121110; --surface: #1B1A18; --tint: #24221F; --ink: #EDEAE3; --ink-2: #C4BFB6; --muted: #9D978D;
   --line: #2F2D29; --accent: #8D97FF; --accent-ink: #0E1030; --accent-soft: #23264A;

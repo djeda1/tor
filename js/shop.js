@@ -2,14 +2,14 @@
 import * as db from './db.js';
 import { ROOM, PHOTO_CREDITS } from './data.js';
 
-const { L, T, EN, money, esc, asset } = db;
+const { L, T, EN, money, esc, asset, thumb } = db;
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
-const thumb = (p) => asset(/^img\/.+\.webp$/.test(p || '') ? p.replace(/\.webp$/, '-s.webp') : p);
-const visible = () => db.products().filter((p) => p.visible);
+const visible = () => db.products().filter((p) => p.visible && !p.archived);
 const catName = (id) => T(db.category(id)?.name) || '—';
 
 // ——— Корзина
+let ready = false; // данные загружены
 const CART_KEY = 'tor:cart:v1';
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { cart = []; }
@@ -25,6 +25,7 @@ function addToCart(pid, color, qty = 1, silent) {
   const can = Math.min(qty, maxQty(p) - have);
   if (can <= 0) { toast(L('Больше нет на складе', 'No more in stock')); return false; }
   if (line) line.qty += can; else cart.push({ pid, color, qty: can });
+  db.track('cart', pid);
   saveCart();
   const b = $('.cart-btn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
   if (!silent) toast(L('Добавлено: ', 'Added: ') + T(p.name), L('Корзина', 'View bag'), openCart);
@@ -33,7 +34,8 @@ function addToCart(pid, color, qty = 1, silent) {
 
 function cartLines() {
   // убираем товары, которые удалили или скрыли в админке
-  cart = cart.filter((l) => { const p = db.product(l.pid); return p && p.visible; });
+  if (!ready) return [];
+  cart = cart.filter((l) => { const p = db.product(l.pid); return p && p.visible && !p.archived; });
   return cart.map((l) => ({ ...l, p: db.product(l.pid) }));
 }
 const cartSum = () => cartLines().reduce((s, l) => s + l.p.price * l.qty, 0);
@@ -157,11 +159,6 @@ function initPeek() {
 // ——— Каталог
 const F = { cat: 'all', q: '', sort: 'pop', min: '', max: '', width: 320, stock: false, sale: false };
 
-function popularity() {
-  const m = {};
-  for (const o of db.orders()) if (o.status !== 'canceled') for (const it of o.items) m[it.pid] = (m[it.pid] || 0) + 1;
-  return m;
-}
 
 function filtered() {
   const q = F.q.trim().toLowerCase();
@@ -178,9 +175,8 @@ function filtered() {
     }
     return true;
   });
-  const pop = popularity();
   const cmp = {
-    pop: (a, b) => (pop[b.id] || 0) - (pop[a.id] || 0),
+    pop: (a, b) => (a.pop || 999) - (b.pop || 999),
     new: (a, b) => (b.tags.includes('new') - a.tags.includes('new')) || b.created - a.created,
     cheap: (a, b) => a.price - b.price,
     dear: (a, b) => b.price - a.price,
@@ -291,6 +287,7 @@ function openProduct(id) {
   if (!p) return;
   closePop();
   cur = { p, img: 0, color: p.colors[0]?.[0] || '', qty: 1, fitW: '', fitD: '' };
+  db.track('product', id);
   renderProduct();
   if (!pd.open) pd.showModal();
   pd.scrollTop = 0; $('.pd-info', pd).scrollTop = 0;
@@ -470,7 +467,7 @@ dr.addEventListener('click', (e) => {
   if (!t) return;
   const lines = cartLines();
   if (t.dataset.act === 'close-cart') dr.close();
-  else if (t.dataset.act === 'checkout') { view = 'checkout'; renderCart(); $('input[name="name"]', dr)?.focus(); }
+  else if (t.dataset.act === 'checkout') { view = 'checkout'; renderCart(); $('input[name="name"]', dr)?.focus(); db.track('checkout'); }
   else if (t.dataset.act === 'back') { view = 'cart'; renderCart(); }
   else if (t.dataset.line) {
     const l = lines[+t.dataset.line];
@@ -494,8 +491,10 @@ dr.addEventListener('input', (e) => {
   el.removeAttribute('aria-invalid');
 });
 dr.addEventListener('change', (e) => { if (e.target.name === 'delivery') { form.delivery = e.target.value; renderCart(); } });
-dr.addEventListener('submit', (e) => {
+let sending = false;
+dr.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (sending) return;
   const f = e.target;
   const bad = [];
   if (form.name.trim().length < 2) bad.push('name');
@@ -503,9 +502,16 @@ dr.addEventListener('submit', (e) => {
   if (form.delivery === 'delivery' && form.address.trim().length < 4) bad.push('address');
   bad.forEach((n) => f.elements[n]?.setAttribute('aria-invalid', 'true'));
   if (bad.length) { f.elements[bad[0]].focus(); toast(L('Проверьте выделенные поля', 'Please check the highlighted fields')); return; }
+  const btn = dr.querySelector('button[type="submit"]');
+  const label = btn.innerHTML;
+  sending = true; btn.disabled = true; btn.innerHTML = `<i class="ph ph-spinner spin" aria-hidden="true"></i>${L('Отправляем…', 'Sending…')}`;
   try {
-    lastOrder = db.createOrder({ ...form, name: form.name.trim(), items: cartLines().map((l) => ({ pid: l.pid, qty: l.qty, color: (l.p.colors.find((c) => c[0] === l.color) || [])[EN ? 2 : 1] || '' })) });
-  } catch (err) { toast(err.message); return; }
+    lastOrder = await db.createOrder({ ...form, name: form.name.trim(), items: cartLines().map((l) => ({ pid: l.pid, qty: l.qty, color: (l.p.colors.find((c) => c[0] === l.color) || [])[EN ? 2 : 1] || '' })) });
+  } catch (err) {
+    toast(db.humanError(err));
+    btn.disabled = false; btn.innerHTML = label;
+    return;
+  } finally { sending = false; }
   cart = []; saveCart();
   form.comment = '';
   view = 'done'; renderCart();
@@ -541,6 +547,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop()
 
 // ——— Прочее
 function renderAll() {
+  if (!ready) return;
   renderRoom(); renderIndex(); renderChips(); renderGrid(); renderCartCount();
   if (pd.open && cur) { const p = db.product(cur.p.id); if (p) { cur.p = p; renderProduct(); } else pd.close(); }
   if (dr.open) renderCart();
@@ -551,11 +558,24 @@ const top = $('#top');
 addEventListener('scroll', () => top.classList.toggle('scrolled', scrollY > 8), { passive: true });
 $('#credits').textContent = PHOTO_CREDITS.join(', ');
 
-renderAll();
+$('#grid').innerHTML = Array.from({ length: 8 }, () => '<li class="card skel" aria-hidden="true"><div class="card-media"></div><div class="card-body"><span></span><span></span></div></li>').join('');
 initFilters();
 initPeek();
+try {
+  await db.init();
+  ready = true;
+  renderAll();
+  db.track('visit');
+} catch (err) {
+  $('#grid').innerHTML = '';
+  $('#empty').hidden = false;
+  $('#empty .empty-title').textContent = L('Каталог не загрузился', 'The catalogue did not load');
+  $('#empty p:not(.empty-title)').textContent = db.humanError(err);
+  $('#empty button').textContent = L('Попробовать ещё раз', 'Try again');
+  $('#empty button').onclick = () => location.reload();
+}
 // на телефоне показываем центр комнаты (диван), а не левый край
 const rs = $('.room-scroll');
 if (rs.scrollWidth > rs.clientWidth) rs.scrollLeft = (rs.scrollWidth - rs.clientWidth) * 0.45;
 setTimeout(() => rs.addEventListener('scroll', () => $('#room').classList.add('panned'), { once: true, passive: true }), 300);
-if (location.hash.length > 1 && db.product(location.hash.slice(1))) openProduct(location.hash.slice(1));
+if (ready && location.hash.length > 1 && db.product(location.hash.slice(1))) openProduct(location.hash.slice(1));

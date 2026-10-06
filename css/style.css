@@ -303,6 +303,13 @@ em { font-family: var(--serif); font-style: italic; font-weight: 500; letter-spa
 .insert-title em { display: block; color: #F4E3C8; }
 .insert .btn { min-height: 44px; padding: 0 18px; font-size: 14.5px; margin-top: 6px; }
 
+.skel .card-media { animation: shimmer 1.2s ease-in-out infinite alternate; }
+.skel .card-body span { display: block; height: 12px; border-radius: 6px; background: var(--tint); margin-top: 8px; width: 70%; }
+.skel .card-body span + span { width: 40%; }
+@keyframes shimmer { to { opacity: .55; } }
+.spin { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
 /* ——— Сервис */
 .service { padding-block: clamp(64px, 9vw, 120px); background: var(--surface); }
 .service-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: center; }
